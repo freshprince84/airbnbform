@@ -4,7 +4,8 @@
   "private": true,
   "proxy": "http://localhost:3001",
   "scripts": {
-    "start": "set PORT=3002 && react-scripts start"
+    "start": "set PORT=3002 && react-scripts start",
+    "build": "react-scripts build"
   },
   "dependencies": {
     "react": "^18.2.0",

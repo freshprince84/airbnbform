@@ -16,7 +16,10 @@ app.use((req, res, next) => {
     'http://localhost:3000', 
     'https://airbnbform.vercel.app',
     'http://65.109.228.106',
-    'https://65.109.228.106'
+    'https://65.109.228.106',
+    // Füge weitere mögliche Domains hinzu
+    'http://65.109.228.106:3002',
+    'http://65.109.228.106:80'
   ];
   const origin = req.headers.origin;
   
