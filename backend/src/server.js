@@ -252,7 +252,7 @@ app.post('/api/admin/contract-template', (req, res) => {
   }
 });
 
-app.post('/generate-contract', async (req, res) => {
+app.post('/api/generate-contract', async (req, res) => {
   console.log('Anfrage zum Generieren eines Vertrags erhalten');
   try {
     const formData = req.body;
@@ -306,7 +306,7 @@ app.post('/generate-contract', async (req, res) => {
 });
 
 // Neue Route zum Hochladen signierter Dokumente
-app.post('/upload-signed-contract', async (req, res) => {
+app.post('/api/upload-signed-contract', async (req, res) => {
   console.log('Anfrage zum Hochladen eines signierten Vertrags erhalten');
   try {
     const { contractBuffer, guestName } = req.body;

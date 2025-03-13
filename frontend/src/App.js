@@ -45,7 +45,7 @@ function App() {
         hasPassportFile: !!formData.passportFile,
       });
 
-      const response = await fetch(`${config.apiBaseUrl}/generate-contract`, {
+      const response = await fetch(`${config.apiBaseUrl}/api/generate-contract`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: { 'Content-Type': 'application/json' },

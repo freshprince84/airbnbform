@@ -139,7 +139,11 @@ const AdminPanel = () => {
 
   const handleDownload = (url, fileName) => {
     // Erstellt einen Link zum Herunterladen und klickt ihn automatisch
-    const fullUrl = `${config.apiBaseUrl}${url}`;
+    // Wenn die URL bereits mit einem Slash beginnt, darf kein zusätzlicher Slash hinzugefügt werden
+    const fullUrl = url.startsWith('/') 
+      ? `${config.apiBaseUrl}${url}` 
+      : `${config.apiBaseUrl}/${url}`;
+    
     const link = document.createElement('a');
     link.href = fullUrl;
     link.setAttribute('download', fileName);

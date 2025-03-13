@@ -26,7 +26,7 @@ const ContractPreview = ({ contractUrl, onSign }) => {
       reader.onload = async (event) => {
         const base64Data = event.target.result.split(',')[1]; // Base64-Teil nach dem Komma extrahieren
         
-        const response = await fetch(`${config.apiBaseUrl}/upload-signed-contract`, {
+        const response = await fetch(`${config.apiBaseUrl}/api/upload-signed-contract`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
