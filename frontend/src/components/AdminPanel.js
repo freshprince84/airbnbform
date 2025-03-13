@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import config from '../config';
 
 const AdminPanel = () => {
   const [files, setFiles] = useState({ 
@@ -33,7 +34,7 @@ const AdminPanel = () => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/admin/files');
+      const response = await fetch(`${config.apiBaseUrl}/api/admin/files`);
       
       if (!response.ok) {
         throw new Error('Fehler beim Abrufen der Dateien');
@@ -52,7 +53,7 @@ const AdminPanel = () => {
 
   const fetchContractTemplate = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/admin/contract-template');
+      const response = await fetch(`${config.apiBaseUrl}/api/admin/contract-template`);
       
       if (!response.ok) {
         throw new Error('Fehler beim Abrufen der Vertragsvorlage');
@@ -107,7 +108,7 @@ const AdminPanel = () => {
         return;
       }
       
-      const response = await fetch('http://localhost:3001/api/admin/contract-template', {
+      const response = await fetch(`${config.apiBaseUrl}/api/admin/contract-template`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +139,7 @@ const AdminPanel = () => {
 
   const handleDownload = (url, fileName) => {
     // Erstellt einen Link zum Herunterladen und klickt ihn automatisch
-    const fullUrl = `http://localhost:3001${url}`;
+    const fullUrl = `${config.apiBaseUrl}${url}`;
     const link = document.createElement('a');
     link.href = fullUrl;
     link.setAttribute('download', fileName);

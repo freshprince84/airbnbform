@@ -9,7 +9,20 @@ app.use(express.json({ limit: '10mb' })); // Erhöhung der Größenbeschränkung
 
 // CORS-Middleware hinzufügen, um Anfragen vom Frontend zu ermöglichen
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3002');
+  const allowedOrigins = ['http://localhost:3002', 'http://localhost:3000', 'https://airbnbform.vercel.app'];
+  const origin = req.headers.origin;
+  
+  // Erlaube Zugriff von allen Ursprüngen in der Liste
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    // Falls der Ursprung nicht in der Liste ist, prüfe, ob wir im Produktionsmodus sind
+    const host = req.headers.host;
+    if (host && (host.endsWith('.vercel.app') || !host.includes('localhost'))) {
+      res.header('Access-Control-Allow-Origin', `https://${host}`);
+    }
+  }
+  
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
   next();

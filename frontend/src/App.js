@@ -3,6 +3,7 @@ import GuestForm from './components/GuestForm';
 import ContractPreview from './components/ContractPreview';
 import AdminPanel from './components/AdminPanel';
 import AdminLogin from './components/AdminLogin';
+import config from './config';
 import './styles.css';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
 
   const checkServerStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/status');
+      const response = await fetch(`${config.apiBaseUrl}/api/status`);
       if (response.ok) {
         setServerStatus('online');
       } else {
@@ -44,7 +45,7 @@ function App() {
         hasPassportFile: !!formData.passportFile,
       });
 
-      const response = await fetch('http://localhost:3001/generate-contract', {
+      const response = await fetch(`${config.apiBaseUrl}/generate-contract`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: { 'Content-Type': 'application/json' },
