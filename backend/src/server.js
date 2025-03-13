@@ -9,22 +9,45 @@ app.use(express.json({ limit: '10mb' })); // Erhöhung der Größenbeschränkung
 
 // CORS-Middleware hinzufügen, um Anfragen vom Frontend zu ermöglichen
 app.use((req, res, next) => {
-  const allowedOrigins = ['http://localhost:3002', 'http://localhost:3000', 'https://airbnbform.vercel.app'];
+  console.log('CORS Request von:', req.headers.origin, 'Für URL:', req.url);
+  
+  const allowedOrigins = [
+    'http://localhost:3002', 
+    'http://localhost:3000', 
+    'https://airbnbform.vercel.app',
+    'http://65.109.228.106',
+    'https://65.109.228.106'
+  ];
   const origin = req.headers.origin;
   
   // Erlaube Zugriff von allen Ursprüngen in der Liste
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
+    console.log('CORS: Origin erlaubt:', origin);
   } else {
     // Falls der Ursprung nicht in der Liste ist, prüfe, ob wir im Produktionsmodus sind
     const host = req.headers.host;
     if (host && (host.endsWith('.vercel.app') || !host.includes('localhost'))) {
+      // Im Produktionsmodus erlauben wir den aktuellen Host
       res.header('Access-Control-Allow-Origin', `https://${host}`);
+      console.log('CORS: Host erlaubt:', host);
+    } else {
+      // Für Entwicklungszwecke können wir alle Ursprünge erlauben
+      // HINWEIS: In Produktion sollte dies entfernt werden!
+      res.header('Access-Control-Allow-Origin', origin || '*');
+      console.log('CORS: Wildcard erlaubt für:', origin || 'keine Origin');
     }
   }
   
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+
+  // Behandlung von Preflight-Anfragen
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
   next();
 });
 
@@ -74,11 +97,6 @@ const saveBase64File = (base64Data, fileName) => {
     }
   });
 };
-
-// OPTIONS-Anfragen für CORS unterstützen
-app.options('*', (req, res) => {
-  res.status(200).end();
-});
 
 // Test-Endpunkt, um zu prüfen, ob der Server läuft
 app.get('/api/status', (req, res) => {

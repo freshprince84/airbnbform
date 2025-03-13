@@ -34,7 +34,7 @@ const AdminPanel = () => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${config.apiBaseUrl}/api/admin/files`);
+      const response = await fetch(`/api/admin/files`);
       
       if (!response.ok) {
         throw new Error('Fehler beim Abrufen der Dateien');
@@ -53,7 +53,7 @@ const AdminPanel = () => {
 
   const fetchContractTemplate = async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/admin/contract-template`);
+      const response = await fetch(`/api/admin/contract-template`);
       
       if (!response.ok) {
         throw new Error('Fehler beim Abrufen der Vertragsvorlage');
@@ -108,7 +108,7 @@ const AdminPanel = () => {
         return;
       }
       
-      const response = await fetch(`${config.apiBaseUrl}/api/admin/contract-template`, {
+      const response = await fetch(`/api/admin/contract-template`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,13 +139,8 @@ const AdminPanel = () => {
 
   const handleDownload = (url, fileName) => {
     // Erstellt einen Link zum Herunterladen und klickt ihn automatisch
-    // Wenn die URL bereits mit einem Slash beginnt, darf kein zusätzlicher Slash hinzugefügt werden
-    const fullUrl = url.startsWith('/') 
-      ? `${config.apiBaseUrl}${url}` 
-      : `${config.apiBaseUrl}/${url}`;
-    
     const link = document.createElement('a');
-    link.href = fullUrl;
+    link.href = url; // Die URL ist bereits vollständig vom Backend geliefert
     link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();

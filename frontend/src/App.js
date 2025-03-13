@@ -19,14 +19,23 @@ function App() {
 
   const checkServerStatus = async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/status`);
+      const apiUrl = `/api/status`;
+      console.log('Prüfe Server-Status unter URL:', apiUrl);
+      
+      const response = await fetch(apiUrl);
+      console.log('Server-Antwort erhalten:', response.status, response.statusText);
+      
       if (response.ok) {
+        const data = await response.json();
+        console.log('Server-Status:', data);
         setServerStatus('online');
       } else {
+        console.error('Server nicht erreichbar - Status Code:', response.status);
         setServerStatus('offline');
       }
     } catch (error) {
       console.error('Server-Statusprüfung fehlgeschlagen:', error);
+      console.error('Details:', error.message);
       setServerStatus('offline');
     }
   };
@@ -45,7 +54,7 @@ function App() {
         hasPassportFile: !!formData.passportFile,
       });
 
-      const response = await fetch(`${config.apiBaseUrl}/api/generate-contract`, {
+      const response = await fetch(`/api/generate-contract`, {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: { 'Content-Type': 'application/json' },
