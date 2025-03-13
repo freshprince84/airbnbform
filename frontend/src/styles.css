@@ -1,0 +1,513 @@
+.App {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input, button {
+  padding: 8px;
+  font-size: 16px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Styling für das Gästeformular */
+.guest-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.form-error {
+  background-color: #fde8e8;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Styling für Admin Login */
+.admin-login {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-login h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Styling für Contract Preview */
+.contract-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contract-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.download-btn, .sign-btn {
+  padding: 10px 15px;
+  text-decoration: none;
+  color: white;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.download-btn {
+  background-color: #28a745;
+  display: inline-block;
+}
+
+.download-btn:hover {
+  background-color: #218838;
+}
+
+.upload-signed-section {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.upload-btn {
+  margin-top: 10px;
+}
+
+.upload-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.status-message {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.signed-doc-preview {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e8f4fd;
+  border-radius: 5px;
+  border-left: 4px solid #007bff;
+}
+
+/* Admin Panel Styles */
+.admin-panel {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.admin-panel h2 {
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.admin-panel h3 {
+  color: #495057;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.admin-panel h4 {
+  color: #6c757d;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.config-section, .files-section, .template-section {
+  background-color: white;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.config-note {
+  font-size: 14px;
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 15px;
+}
+
+.success-message {
+  color: #28a745;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.save-btn, .refresh-btn, .toggle-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.refresh-btn {
+  background-color: #17a2b8;
+}
+
+.toggle-btn {
+  background-color: #6c757d;
+}
+
+.save-btn:hover {
+  background-color: #218838;
+}
+
+.refresh-btn:hover {
+  background-color: #138496;
+}
+
+.toggle-btn:hover {
+  background-color: #5a6268;
+}
+
+.files-lists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.passports-list, .contracts-list {
+  flex: 1;
+  min-width: 300px;
+}
+
+.files-lists ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.files-lists li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.files-lists li:hover {
+  background-color: #f8f9fa;
+}
+
+.file-name {
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.file-date {
+  font-size: 12px;
+  color: #6c757d;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+/* Contracts Table Styles */
+.contracts-table {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 15px;
+}
+
+.contracts-table table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.contracts-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid #ddd;
+}
+
+.contracts-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.contracts-table .actions-cell {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-start;
+}
+
+.contracts-table .signed-contract {
+  background-color: #e6f7ff;
+}
+
+.contracts-table .download-btn,
+.contracts-table .download-passport-btn {
+  padding: 5px 10px;
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.contracts-table .icon {
+  font-size: 18px;
+}
+
+.contracts-table .download-btn:hover {
+  background-color: #e2e6ea;
+}
+
+.contracts-table .download-passport-btn:hover {
+  background-color: #e2e6ea;
+}
+
+.standalone-passports {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px dashed #ccc;
+}
+
+.standalone-passports h4 {
+  margin-bottom: 10px;
+}
+
+.standalone-passports ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+.standalone-passports li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.download-btn-small {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 2px 8px;
+  font-size: 14px;
+}
+
+.download-btn-small:hover {
+  background-color: #e2e6ea;
+}
+
+/* Template Editor Styles */
+.template-editor {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.template-editor textarea {
+  width: 100%;
+  font-family: monospace;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.template-info {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #6c757d;
+  background-color: #e9ecef;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 4px solid #17a2b8;
+}
+
+/* Navigation für Admin/Benutzer-Wechsel */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-link {
+  color: #007bff;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.nav-link:hover, .nav-link.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Dateiprozessierung und Fortschrittsanzeige */
+.progress-message {
+  background-color: #e9f5fe;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+}
+
+.file-info {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  margin-right: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Server-Status-Anzeige */
+.server-status {
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.retry-btn {
+  background-color: #6c757d;
+  padding: 5px 10px;
+  margin-left: 15px;
+  font-size: 14px;
+}
+
+.retry-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Status-Nachrichtenformatierung */
+.status-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-message.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-message.warning {
+  background-color: #fff3cd;
+  color: #856404;
+} 

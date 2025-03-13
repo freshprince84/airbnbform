@@ -1,0 +1,55 @@
+{
+  "title": "MIETVERTRAG FÜR TOURISTISCHE UNTERKÜNFTE",
+  "dateLine": "Datum: {currentDate}",
+  "sections": [
+    {
+      "title": "1. VERTRAGSPARTEIEN",
+      "content": [
+        {
+          "label": "Vermieter: ",
+          "value": "Airbnb Gastgeber / Airbnb Host"
+        },
+        {
+          "label": "Gast: ",
+          "value": "{name}"
+        },
+        {
+          "label": "Reisepass-Nr: ",
+          "value": "{passportNumber}"
+        }
+      ]
+    },
+    {
+      "title": "2. MIETOBJEKT",
+      "content": [
+        {
+          "value": "Ferienunterkunft in Kolumbien gemäß Airbnb-Angebot"
+        }
+      ]
+    },
+    {
+      "title": "3. MIETDAUER",
+      "content": [
+        {
+          "label": "Ankunftsdatum: ",
+          "value": "{arrivalDate}"
+        },
+        {
+          "value": "Die genaue Aufenthaltsdauer ist in der Airbnb-Buchung festgelegt."
+        }
+      ]
+    },
+    {
+      "title": "4. UNTERSCHRIFTEN",
+      "content": [
+        {
+          "value": "Dieser Vertrag wird elektronisch oder in ausgedruckter Form zur Verfügung gestellt und kann in beiden Formaten unterzeichnet werden."
+        },
+        {
+          "label": "Datum und Unterschrift des Gastes: ",
+          "value": ""
+        }
+      ]
+    }
+  ]
+}
