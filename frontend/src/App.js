@@ -139,7 +139,7 @@ function App() {
       ) : (
         <>
           {!contractUrl ? (
-            <GuestForm onSubmit={handleFormSubmit} />
+            <GuestForm onSubmit={handleFormSubmit} serverStatus={{ isConnected: serverStatus === 'online' }} />
           ) : (
             <>
               <ContractPreview contractUrl={contractUrl} onSign={handleSign} />
