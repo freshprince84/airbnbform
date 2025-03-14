@@ -10,6 +10,12 @@ const AdminPanel = () => {
     folderPath: '',
     apiKey: ''
   });
+  const [hostSettings, setHostSettings] = useState({
+    hostFirstName: '',
+    hostLastName: '',
+    propertyAddress: '',
+    rentalAmount: ''
+  });
   const [contractTemplate, setContractTemplate] = useState(null);
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
   const [templateEditorContent, setTemplateEditorContent] = useState('');
@@ -17,7 +23,9 @@ const AdminPanel = () => {
   const [error, setError] = useState(null);
   const [configSaved, setConfigSaved] = useState(false);
   const [templateSaved, setTemplateSaved] = useState(false);
+  const [hostSettingsSaved, setHostSettingsSaved] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
+  const [templateFile, setTemplateFile] = useState(null);
 
   useEffect(() => {
     // Laden der gespeicherten Dateien beim Mounten der Komponente
@@ -28,6 +36,12 @@ const AdminPanel = () => {
     const savedConfig = localStorage.getItem('driveConfig');
     if (savedConfig) {
       setDriveConfig(JSON.parse(savedConfig));
+    }
+    
+    // Laden der gespeicherten Gastgebereinstellungen
+    const savedHostSettings = localStorage.getItem('hostSettings');
+    if (savedHostSettings) {
+      setHostSettings(JSON.parse(savedHostSettings));
     }
   }, []);
 
@@ -74,6 +88,25 @@ const AdminPanel = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleHostSettingsChange = (e) => {
+    const { name, value } = e.target;
+    setHostSettings(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const saveHostSettings = () => {
+    // Speichern der Gastgebereinstellungen im localStorage
+    localStorage.setItem('hostSettings', JSON.stringify(hostSettings));
+    setHostSettingsSaved(true);
+    
+    // Nach 3 Sekunden die Erfolgsmeldung zurücksetzen
+    setTimeout(() => {
+      setHostSettingsSaved(false);
+    }, 3000);
   };
 
   const saveConfig = () => {
@@ -147,6 +180,45 @@ const AdminPanel = () => {
     document.body.removeChild(link);
   };
 
+  const handleTemplateFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setTemplateFile(e.target.files[0]);
+    }
+  };
+
+  const uploadTemplateFile = async () => {
+    if (!templateFile) {
+      alert('Bitte wählen Sie eine Datei aus');
+      return;
+    }
+
+    try {
+      // Datei als FormData vorbereiten
+      const formData = new FormData();
+      formData.append('template', templateFile);
+      
+      const response = await fetch('/api/admin/upload-contract-template', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert('Vertragsvorlage erfolgreich hochgeladen!');
+        setTemplateFile(null);
+        // Input-Feld zurücksetzen
+        const fileInput = document.getElementById('templateFileInput');
+        if (fileInput) fileInput.value = '';
+      } else {
+        alert('Fehler beim Hochladen: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Fehler beim Hochladen der Vorlage:', error);
+      alert('Fehler beim Hochladen der Vorlage: ' + error.message);
+    }
+  };
+
   return (
     <div className="admin-panel">
       <h2>Admin-Bereich</h2>
@@ -185,10 +257,94 @@ const AdminPanel = () => {
         </p>
       </div>
       
+      <div className="host-settings-section">
+        <h3>Gastgeber-Informationen</h3>
+        <div className="form-group">
+          <label htmlFor="hostFirstName">Vorname des Gastgebers:</label>
+          <input 
+            type="text" 
+            id="hostFirstName" 
+            name="hostFirstName" 
+            value={hostSettings.hostFirstName} 
+            onChange={handleHostSettingsChange}
+            placeholder="Vorname des Gastgebers"
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="hostLastName">Nachname des Gastgebers:</label>
+          <input 
+            type="text" 
+            id="hostLastName" 
+            name="hostLastName" 
+            value={hostSettings.hostLastName} 
+            onChange={handleHostSettingsChange}
+            placeholder="Nachname des Gastgebers"
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="propertyAddress">Adresse der Unterkunft:</label>
+          <input 
+            type="text" 
+            id="propertyAddress" 
+            name="propertyAddress" 
+            value={hostSettings.propertyAddress} 
+            onChange={handleHostSettingsChange}
+            placeholder="Vollständige Adresse der Unterkunft"
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="rentalAmount">Mietbetrag:</label>
+          <input 
+            type="text" 
+            id="rentalAmount" 
+            name="rentalAmount" 
+            value={hostSettings.rentalAmount} 
+            onChange={handleHostSettingsChange}
+            placeholder="z.B. 500€ pro Nacht"
+          />
+        </div>
+        
+        <button onClick={saveHostSettings} className="save-btn">Gastgebereinstellungen speichern</button>
+        {hostSettingsSaved && <p className="success-message">Gastgebereinstellungen gespeichert!</p>}
+      </div>
+      
       <div className="template-section">
         <h3>Vertragsvorlage</h3>
+        
+        <div className="template-upload">
+          <h4>Vertragsvorlage als Word-Dokument hochladen</h4>
+          <p className="template-info">
+            Laden Sie ein Word-Dokument als Vertragsvorlage hoch. Folgende Platzhalter werden automatisch ersetzt:
+            {'{guestFirstName}'}, {'{guestLastName}'}, {'{checkInDate}'}, {'{checkOutDate}'}, {'{hostFirstName}'}, {'{hostLastName}'}, {'{propertyAddress}'}, {'{rentalAmount}'}
+          </p>
+          <div className="form-group">
+            <input 
+              type="file" 
+              id="templateFileInput" 
+              accept=".docx" 
+              onChange={handleTemplateFileChange}
+            />
+            {templateFile && (
+              <div className="file-info">
+                Ausgewählte Datei: {templateFile.name} 
+                ({Math.round(templateFile.size / 1024)} KB)
+              </div>
+            )}
+            <button 
+              onClick={uploadTemplateFile} 
+              className="upload-btn" 
+              disabled={!templateFile}
+            >
+              Vorlage hochladen
+            </button>
+          </div>
+        </div>
+        
         <button onClick={toggleTemplateEditor} className="toggle-btn">
-          {showTemplateEditor ? 'Editor schließen' : 'Vertragsvorlage bearbeiten'}
+          {showTemplateEditor ? 'Editor schließen' : 'JSON-Vertragsvorlage bearbeiten (Legacy)'}
         </button>
         
         {showTemplateEditor && (

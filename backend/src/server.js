@@ -3,9 +3,47 @@ const { generateContract } = require('./contractTemplate');
 const { uploadToDrive } = require('./googleDrive');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
 app.use(express.json({ limit: '10mb' })); // Erhöhung der Größenbeschränkung für größere Dateien
+
+// Multer für Datei-Uploads konfigurieren
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const destPath = path.join(__dirname, '../templates');
+    if (!fs.existsSync(destPath)) {
+      fs.mkdirSync(destPath, { recursive: true });
+    }
+    cb(null, destPath);
+  },
+  filename: (req, file, cb) => {
+    // Speichern mit Originalname für Vertragsvorlagen
+    if (file.fieldname === 'template') {
+      cb(null, 'contract_template.docx');
+    } else {
+      cb(null, file.originalname);
+    }
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB Limit
+  fileFilter: (req, file, cb) => {
+    // Überprüfen des Dateityps
+    if (file.fieldname === 'template') {
+      if (file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        cb(null, true);
+      } else {
+        cb(new Error('Nur Word-Dokumente (.docx) sind erlaubt.'));
+      }
+    } else {
+      // Für andere Dateien (wie Passports) akzeptieren wir verschiedene Typen
+      cb(null, true);
+    }
+  }
+});
 
 // CORS-Middleware hinzufügen, um Anfragen vom Frontend zu ermöglichen
 app.use((req, res, next) => {
@@ -64,6 +102,14 @@ if (!fs.existsSync(templatesDir)) {
   const defaultTemplate = require('./contractTemplate').getDefaultTemplate();
   fs.writeFileSync(path.join(templatesDir, 'default_template.json'), JSON.stringify(defaultTemplate, null, 2));
   console.log('Standard-Vertragsvorlage erstellt');
+}
+
+// Standardvertragsvorlage als Word-Dokument erstellen, falls sie nicht existiert
+const templateWordPath = path.join(templatesDir, 'contract_template.docx');
+if (!fs.existsSync(templateWordPath)) {
+  // Hier würde normalerweise die Erstellung der Word-Vorlage erfolgen
+  // Für diesen Kontext nehmen wir an, dass die Vorlage später hochgeladen wird
+  console.log('Keine Word-Vertragsvorlage gefunden. Bitte laden Sie eine hoch.');
 }
 
 // Verzeichnis für Uploads erstellen, falls es nicht existiert
@@ -364,6 +410,91 @@ app.post('/api/upload-signed-contract', async (req, res) => {
     console.error(error.stack);
     res.status(500).json({ 
       error: 'Fehler beim Hochladen des Dokuments',
+      details: error.message
+    });
+  }
+});
+
+// API-Endpunkt zum Hochladen der Vertragsvorlage als Word-Dokument
+app.post('/api/admin/upload-contract-template', upload.single('template'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Keine Datei hochgeladen' });
+    }
+    
+    console.log('Vertragsvorlage hochgeladen:', req.file.path);
+    
+    // Hier könnten weitere Verarbeitungsschritte erfolgen, wie das Validieren des Dokuments
+    // oder das Extrahieren von Metadaten
+    
+    res.json({ 
+      success: true, 
+      message: 'Vertragsvorlage erfolgreich hochgeladen',
+      file: {
+        filename: req.file.filename,
+        path: req.file.path,
+        size: req.file.size
+      }
+    });
+  } catch (error) {
+    console.error('Fehler beim Hochladen der Vertragsvorlage:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Hochladen der Vertragsvorlage',
+      details: error.message
+    });
+  }
+});
+
+// API-Endpunkt für Gastgebereinstellungen
+app.post('/api/admin/host-settings', (req, res) => {
+  try {
+    const hostSettings = req.body;
+    
+    if (!hostSettings || typeof hostSettings !== 'object') {
+      return res.status(400).json({ error: 'Ungültiges Format für Gastgebereinstellungen' });
+    }
+    
+    const hostSettingsPath = path.join(templatesDir, 'host_settings.json');
+    fs.writeFileSync(hostSettingsPath, JSON.stringify(hostSettings, null, 2));
+    
+    console.log('Gastgebereinstellungen gespeichert:', hostSettings);
+    res.json({ 
+      success: true, 
+      message: 'Gastgebereinstellungen erfolgreich gespeichert' 
+    });
+  } catch (error) {
+    console.error('Fehler beim Speichern der Gastgebereinstellungen:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Speichern der Gastgebereinstellungen',
+      details: error.message
+    });
+  }
+});
+
+// API-Endpunkt zum Abrufen der Gastgebereinstellungen
+app.get('/api/admin/host-settings', (req, res) => {
+  try {
+    const hostSettingsPath = path.join(templatesDir, 'host_settings.json');
+    
+    if (!fs.existsSync(hostSettingsPath)) {
+      // Falls keine Einstellungen existieren, leere Standardeinstellungen zurückgeben
+      return res.json({
+        hostFirstName: '',
+        hostLastName: '',
+        propertyAddress: '',
+        rentalAmount: ''
+      });
+    }
+    
+    const hostSettingsContent = fs.readFileSync(hostSettingsPath, 'utf8');
+    const hostSettings = JSON.parse(hostSettingsContent);
+    
+    console.log('Gastgebereinstellungen abgerufen');
+    res.json(hostSettings);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Gastgebereinstellungen:', error);
+    res.status(500).json({ 
+      error: 'Fehler beim Abrufen der Gastgebereinstellungen',
       details: error.message
     });
   }

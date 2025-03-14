@@ -16,10 +16,6 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
     checkInDate: '',
     checkOutDate: '',
     guests: 1,
-    hostFirstName: '',
-    hostLastName: '',
-    propertyAddress: '',
-    rentalAmount: '',
     specialAgreements: '',
   });
 
@@ -107,12 +103,6 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
     if (!formData.email.trim()) errors.email = 'E-Mail ist erforderlich';
     if (!formData.checkInDate) errors.checkInDate = 'Check-in Datum ist erforderlich';
     if (!formData.checkOutDate) errors.checkOutDate = 'Check-out Datum ist erforderlich';
-    
-    // Überprüfung der Host-Informationen
-    if (!formData.hostFirstName.trim()) errors.hostFirstName = 'Vorname des Gastgebers ist erforderlich';
-    if (!formData.hostLastName.trim()) errors.hostLastName = 'Nachname des Gastgebers ist erforderlich';
-    if (!formData.propertyAddress.trim()) errors.propertyAddress = 'Adresse der Unterkunft ist erforderlich';
-    if (!formData.rentalAmount.trim()) errors.rentalAmount = 'Mietbetrag ist erforderlich';
     
     // Überprüfung des E-Mail-Formats
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -225,10 +215,6 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
       checkInDate: '',
       checkOutDate: '',
       guests: 1,
-      hostFirstName: '',
-      hostLastName: '',
-      propertyAddress: '',
-      rentalAmount: '',
       specialAgreements: '',
     });
     
@@ -328,58 +314,6 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
           disabled={generatingContract}
         />
         {formErrors.guests && <div className="error-message">{formErrors.guests}</div>}
-      </div>
-      
-      <div className="form-group">
-        <label htmlFor="hostFirstName">Vorname des Gastgebers:</label>
-        <input 
-          type="text" 
-          id="hostFirstName"
-          name="hostFirstName" 
-          value={formData.hostFirstName} 
-          onChange={handleInputChange} 
-          disabled={generatingContract}
-        />
-        {formErrors.hostFirstName && <div className="error-message">{formErrors.hostFirstName}</div>}
-      </div>
-      
-      <div className="form-group">
-        <label htmlFor="hostLastName">Nachname des Gastgebers:</label>
-        <input 
-          type="text" 
-          id="hostLastName"
-          name="hostLastName" 
-          value={formData.hostLastName} 
-          onChange={handleInputChange} 
-          disabled={generatingContract}
-        />
-        {formErrors.hostLastName && <div className="error-message">{formErrors.hostLastName}</div>}
-      </div>
-      
-      <div className="form-group">
-        <label htmlFor="propertyAddress">Adresse der Unterkunft:</label>
-        <input 
-          type="text" 
-          id="propertyAddress"
-          name="propertyAddress" 
-          value={formData.propertyAddress} 
-          onChange={handleInputChange} 
-          disabled={generatingContract}
-        />
-        {formErrors.propertyAddress && <div className="error-message">{formErrors.propertyAddress}</div>}
-      </div>
-      
-      <div className="form-group">
-        <label htmlFor="rentalAmount">Mietbetrag:</label>
-        <input 
-          type="text" 
-          id="rentalAmount"
-          name="rentalAmount" 
-          value={formData.rentalAmount} 
-          onChange={handleInputChange} 
-          disabled={generatingContract}
-        />
-        {formErrors.rentalAmount && <div className="error-message">{formErrors.rentalAmount}</div>}
       </div>
       
       <div className="form-group">
