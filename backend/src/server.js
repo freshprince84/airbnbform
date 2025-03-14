@@ -319,27 +319,28 @@ app.post('/api/admin/contract-template', (req, res) => {
   }
 });
 
-app.post('/api/generate-contract', async (req, res) => {
+// Route zum Generieren des Vertrags mit Unterstützung für Datei-Uploads
+app.post('/api/generate-contract', upload.single('passport'), async (req, res) => {
   console.log('Anfrage zum Generieren eines Vertrags erhalten');
   try {
+    // Formular-Daten kommen aus req.body, Datei kommt aus req.file
     const formData = req.body;
-    console.log('Empfangene Formulardaten:', {
-      name: formData.name,
-      passportNumber: formData.passportNumber,
-      arrivalDate: formData.arrivalDate,
-      passportFileReceived: !!formData.passportFile
-    });
-    
-    // Speichern der Passport-Datei, falls vorhanden
+    console.log('Empfangene Formulardaten:', formData);
+
+    // Wenn eine Passfoto-Datei hochgeladen wurde
     let passportFilePath = null;
-    if (formData.passportFile && formData.passportFile.data) {
-      console.log('Passport-Datei gefunden, speichere...');
-      const fileName = `passport_${formData.name}_${Date.now()}_${formData.passportFile.name}`;
-      passportFilePath = await saveBase64File(formData.passportFile.data, fileName);
+    if (req.file) {
+      console.log('Passport-Datei gefunden:', req.file.originalname);
+      passportFilePath = req.file.path;
       console.log('Pass-Datei gespeichert unter:', passportFilePath);
+      
+      // Speichere die Datei-Information im formData-Objekt
+      formData.passportFile = {
+        name: req.file.originalname,
+        path: passportFilePath
+      };
     } else {
-      console.log('Keine Passport-Datei in den Formulardaten gefunden oder keine Daten vorhanden');
-      console.log('Passport-Dateiformat:', formData.passportFile ? JSON.stringify(Object.keys(formData.passportFile)) : 'null');
+      console.log('Keine Passport-Datei in der Anfrage gefunden');
     }
     
     // Vertrag generieren
@@ -347,27 +348,38 @@ app.post('/api/generate-contract', async (req, res) => {
     const contractBuffer = await generateContract(formData);
     
     // Speichern des Vertrags lokal
-    const contractFileName = `Vertrag_${formData.name}_${Date.now()}.docx`;
+    const contractFileName = `Vertrag_${formData.firstName || 'Gast'}_${formData.lastName || ''}_${Date.now()}.docx`;
     const contractPath = path.join(contractsDir, contractFileName);
     console.log('Speichere Vertrag unter:', contractPath);
     fs.writeFileSync(contractPath, contractBuffer);
     
     // Vertrag auf Google Drive hochladen
     console.log('Lade Vertrag auf Google Drive hoch...');
-    const driveUrl = await uploadToDrive(contractBuffer, contractFileName);
+    let driveUrl = '';
+    try {
+      driveUrl = await uploadToDrive(contractBuffer, contractFileName);
+      console.log('Vertrag hochgeladen nach Google Drive:', driveUrl);
+    } catch (uploadError) {
+      console.error('Fehler beim Hochladen auf Google Drive:', uploadError);
+      // Wir setzen driveUrl auf den lokalen Pfad als Fallback
+      driveUrl = `/api/download/${contractFileName}`;
+    }
     
-    console.log('Vertrag generiert und hochgeladen:', driveUrl);
+    // URL zum Herunterladen des Vertrags zurückgeben
+    const downloadUrl = driveUrl || `/api/download/${contractFileName}`;
     
-    res.json({ 
-      url: driveUrl,
-      localPath: contractPath
+    res.json({
+      success: true,
+      message: 'Vertrag erfolgreich generiert',
+      url: downloadUrl,
+      fileName: contractFileName
     });
+    
   } catch (error) {
-    console.error('Fehler bei der Vertragsgenerierung:', error.message);
-    console.error(error.stack);
-    res.status(500).json({ 
-      error: 'Fehler bei der Vertragsgenerierung',
-      details: error.message
+    console.error('Fehler beim Generieren des Vertrags:', error);
+    res.status(500).json({
+      success: false,
+      message: `Fehler bei der Vertragsgenerierung: ${error.message}`
     });
   }
 });
@@ -495,6 +507,64 @@ app.get('/api/admin/host-settings', (req, res) => {
     console.error('Fehler beim Abrufen der Gastgebereinstellungen:', error);
     res.status(500).json({ 
       error: 'Fehler beim Abrufen der Gastgebereinstellungen',
+      details: error.message
+    });
+  }
+});
+
+// Route zum Herunterladen eines generierten Vertrags
+app.get('/api/download/:fileName', (req, res) => {
+  try {
+    const fileName = req.params.fileName;
+    const filePath = path.join(contractsDir, fileName);
+    
+    console.log(`Anfrage zum Herunterladen von Datei: ${fileName}`);
+    
+    // Überprüfen, ob die Datei existiert
+    if (!fs.existsSync(filePath)) {
+      console.log(`Datei nicht gefunden: ${filePath}`);
+      return res.status(404).json({ 
+        error: 'Datei nicht gefunden',
+        requestedFile: fileName
+      });
+    }
+    
+    // Datei zum Download anbieten
+    console.log(`Sende Datei: ${filePath}`);
+    res.download(filePath);
+  } catch (error) {
+    console.error(`Fehler beim Herunterladen von ${req.params.fileName}:`, error);
+    res.status(500).json({ 
+      error: 'Fehler beim Herunterladen der Datei',
+      details: error.message
+    });
+  }
+});
+
+// Route zum Betrachten eines Passfotos im Browser
+app.get('/api/passport/:fileName', (req, res) => {
+  try {
+    const fileName = req.params.fileName;
+    const filePath = path.join(uploadsDir, fileName);
+    
+    console.log(`Anfrage zum Anzeigen von Passfoto: ${fileName}`);
+    
+    // Überprüfen, ob die Datei existiert
+    if (!fs.existsSync(filePath)) {
+      console.log(`Passfoto nicht gefunden: ${filePath}`);
+      return res.status(404).json({ 
+        error: 'Passfoto nicht gefunden',
+        requestedFile: fileName
+      });
+    }
+    
+    // Datei zum Anzeigen senden (wird im Browser geöffnet)
+    console.log(`Sende Passfoto: ${filePath}`);
+    res.sendFile(filePath);
+  } catch (error) {
+    console.error(`Fehler beim Anzeigen von ${req.params.fileName}:`, error);
+    res.status(500).json({ 
+      error: 'Fehler beim Anzeigen des Passfotos',
       details: error.message
     });
   }

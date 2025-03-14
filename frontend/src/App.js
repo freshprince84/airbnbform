@@ -7,7 +7,7 @@ import config from './config';
 import './styles.css';
 
 function App() {
-  const [contractUrl, setContractUrl] = useState(null);
+  const [contractData, setContractData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [serverStatus, setServerStatus] = useState('checking');
@@ -48,25 +48,15 @@ function App() {
       }
 
       console.log('Sende Formulardaten:', {
-        name: formData.name,
-        passportNumber: formData.passportNumber,
-        arrivalDate: formData.arrivalDate,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
         hasPassportFile: !!formData.passportFile,
       });
 
-      const response = await fetch(`/api/generate-contract`, {
-        method: 'POST',
-        body: JSON.stringify(formData),
-        headers: { 'Content-Type': 'application/json' },
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unbekannter Fehler' }));
-        throw new Error(errorData.error || 'Fehler bei der Vertragsgenerierung');
-      }
-      
-      const data = await response.json();
-      setContractUrl(data.url);
+      // Formular wurde bereits in GuestForm.js mit FormData abgesendet
+      // Hier müssen wir die Daten nur für die nächste Ansicht speichern
+      setContractData(formData.contractData);
     } catch (error) {
       console.error('Fehler beim Senden der Formulardaten:', error);
       alert(`Es ist ein Fehler aufgetreten: ${error.message || 'Unbekannter Fehler'}. Bitte versuchen Sie es erneut.`);
@@ -96,7 +86,7 @@ function App() {
   };
 
   const resetForm = () => {
-    setContractUrl(null);
+    setContractData(null);
   };
 
   return (
@@ -138,11 +128,11 @@ function App() {
         )
       ) : (
         <>
-          {!contractUrl ? (
+          {!contractData ? (
             <GuestForm onSubmit={handleFormSubmit} serverStatus={{ isConnected: serverStatus === 'online' }} />
           ) : (
             <>
-              <ContractPreview contractUrl={contractUrl} onSign={handleSign} />
+              <ContractPreview contractData={contractData} onSign={handleSign} />
               <button 
                 onClick={resetForm} 
                 style={{ marginTop: '20px' }}

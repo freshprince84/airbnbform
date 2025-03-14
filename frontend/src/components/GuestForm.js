@@ -134,19 +134,13 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
     return Object.keys(errors).length === 0;
   };
 
-  // Handler zum Absenden des Formulars und Generieren des Vertrags
-  const handleSubmit = async (e) => {
+  // Handler für das Absenden des Formulars
+  const onSubmit = async (e) => {
     e.preventDefault();
     
-    // Zurücksetzen aller vorherigen Statuszustände
-    setContractError('');
-    setContractData(null);
-    
-    // Validierung aller Felder
-    const isValid = validateForm();
-    setValidated(true);
-    
-    if (!isValid) {
+    // Formularvalidierung
+    if (!validateForm()) {
+      setValidated(true);
       return;
     }
     
@@ -165,11 +159,14 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
     
     try {
       setGeneratingContract(true);
+      setContractError('');
       
       // Überprüfen, ob der Server erreichbar ist
       if (!serverStatus.isConnected) {
         throw new Error('Der Server ist nicht erreichbar. Bitte versuchen Sie es später erneut.');
       }
+      
+      console.log('Sende Formular mit Passfoto:', !!passportFile);
       
       // Abfrage zum Generieren des Vertrags
       const response = await fetch('/api/generate-contract', {
@@ -189,13 +186,32 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
       }
       
       const result = await response.json();
+      console.log('Vom Server erhaltene Vertragsdaten:', result);
+      
+      // Passfoto-URL erstellen, falls vorhanden
+      let passportUrl = null;
+      if (passportFile) {
+        // Wir nehmen an, dass der Dateiname im Backend vom ursprünglichen Namen abgeleitet wurde
+        const fileName = encodeURIComponent(passportFile.name);
+        passportUrl = `/api/passport/${fileName}`;
+      }
+      
+      // Vertragsdaten mit Passfoto-URL ergänzen
+      const completeContractData = {
+        ...result,
+        passportUrl: passportUrl
+      };
       
       // Erfolgreiche Generierung des Vertrags
-      setContractData(result);
+      setContractData(completeContractData);
       
       // Callback für übergeordnete Komponente
       if (onFormSubmit) {
-        onFormSubmit(formData, result);
+        // Formular- und Vertragsdaten zurückgeben
+        onFormSubmit({
+          ...formData,
+          contractData: completeContractData
+        });
       }
       
     } catch (error) {
@@ -237,7 +253,7 @@ const GuestForm = ({ onFormSubmit, serverStatus }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="guest-form" ref={formRef}>
+    <form onSubmit={onSubmit} className="guest-form" ref={formRef}>
       <div className="form-group">
         <label htmlFor="firstName">Vorname:</label>
         <input 
